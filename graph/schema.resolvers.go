@@ -6,7 +6,9 @@ package graph
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Mark-Otte/EMS/graph/model"
@@ -27,7 +29,8 @@ func (r *mutationResolver) CreateEmployee(ctx context.Context,
 		http.Error(r.writ, "Invalid or missing JWT token", http.StatusUnauthorized)
 		return nil, nil
 	}
-	panic(fmt.Errorf("not implemented: CreateEmployee - createEmployee"))
+	http.NotFound(r.writ, r.req)
+	return nil, nil
 }
 
 // GetEmployeeByID is the resolver for the getEmployeeByID field.
@@ -41,7 +44,8 @@ func (r *queryResolver) GetEmployeeByID(ctx context.Context, id int) (*model.Emp
 		http.Error(r.writ, "Invalid or missing JWT token", http.StatusUnauthorized)
 		return nil, nil
 	}
-	panic(fmt.Errorf("not implemented: GetEmployeeByID - getEmployeeByID"))
+	http.NotFound(r.writ, r.req)
+	return nil, nil
 }
 
 // GetAllEmployees is the resolver for the getAllEmployees field.
@@ -55,7 +59,9 @@ func (r *queryResolver) GetAllEmployees(ctx context.Context) ([]*model.Employee,
 		http.Error(r.writ, "Invalid or missing JWT token", http.StatusUnauthorized)
 		return nil, nil
 	}
-	panic(fmt.Errorf("not implemented: GetAllEmployees - getAllEmployees"))
+	// query the database
+	query(ctx)
+	return nil, nil
 }
 
 // Mutation returns MutationResolver implementation.
@@ -66,3 +72,54 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// _____________________________________
+// Attempt at querying the database
+func query(ctx context.Context) {
+	// Connection string for the Azure SQL database
+	connString := "server=localhost;user id=sa;password=YourStrongPassword1234;database=mssql"
+
+	// Establish a database connection
+	db, err := sql.Open("sqlserver", connString)
+	if err != nil {
+		log.Fatal("Error connecting to the database: ", err.Error())
+	}
+	defer db.Close()
+
+	// Query the employees table
+	rows, err := db.Query("SELECT * FROM Employee")
+	if err != nil {
+		log.Fatal("Error executing query: ", err.Error())
+	}
+	defer rows.Close()
+
+	// Iterate over the result set
+	for rows.Next() {
+		var (
+			id           int
+			firstName    string
+			lastName     string
+			username     string
+			password     string
+			email        string
+			dob          string
+			departmentID int
+			position     string
+		)
+
+		// Scan the row values into variables
+		err := rows.Scan(&id, &firstName, &lastName, &username, &password, &email, &dob, &departmentID, &position)
+		if err != nil {
+			log.Fatal("Error scanning row: ", err.Error())
+		}
+
+		// Print the employee details
+		fmt.Printf("ID: %d, Name: %s %s, Username: %s, Email: %s, DOB: %s, DepartmentID: %d, Position: %s\n",
+			id, firstName, lastName, username, email, dob, departmentID, position)
+	}
+
+	// Check for any errors occurred during iteration
+	if err = rows.Err(); err != nil {
+		log.Fatal("Error iterating rows: ", err.Error())
+	}
+}
