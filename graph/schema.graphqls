@@ -1,0 +1,36 @@
+type Employee {
+  ID: Int!
+  FirstName: String!
+  LastName: String!
+  Username: String!
+  Password: String!
+  Email: String!
+  DOB: String!
+  DepartmentID: Int!
+  Position: String!
+  Department: Department!
+}
+
+type Department {
+  ID: Int!
+  Name: String!
+  Employees: [Employee!]!
+}
+
+type Query {
+  getEmployeeByID(ID: Int!): Employee
+  getAllEmployees: [Employee!]!
+}
+
+type Mutation {
+  createEmployee(
+    FirstName: String!
+    LastName: String!
+    Username: String!
+    Password: String!
+    Email: String!
+    DOB: String!
+    DepartmentID: Int!
+    Position: String!
+  ): Employee
+}
