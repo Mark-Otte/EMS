@@ -13,20 +13,9 @@ import (
 
 // Handler for the /login endpoint
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse the request body
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Get the username and password from the request body
-	username := r.Form.Get("username")
-	password := r.Form.Get("password")
-
-	// This is where i'd access the database and query by username
-	// to return a hashed password to check against input pasword
-	// that would also get hashed
+	// Retrieve the username and password from the query parameters
+	username := r.URL.Query().Get("username")
+	password := r.URL.Query().Get("password")
 
 	// For this example, check if the username and password are valid
 	if username == "admin" && password == "password" {
