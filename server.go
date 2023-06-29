@@ -6,8 +6,9 @@ import (
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/Mark-Otte/EMS/graph"
 	"github.com/dgrijalva/jwt-go"
+
+	"github.com/Mark-Otte/EMS/graph"
 )
 
 // Handler for the /login endpoint
@@ -23,8 +24,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 
-	// Implement your authentication logic here
-	// ...
+	// This is where i'd access the database and query by username
+	// to return a hashed password to check against input pasword
+	// that would also get hashed
 
 	// For this example, check if the username and password are valid
 	if username == "admin" && password == "password" {
