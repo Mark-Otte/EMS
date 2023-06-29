@@ -12,3 +12,9 @@ tried to create the email notification
 
 When querying the API for employee information, no results will be found as the database isn't connected.
 
+The functioning login details are only hardcoded in as again, no DB connection
+To login and get a JWT:
+
+"localhost:8080/login?username=admin&password=password"
+
+Then to make use of the token, Create a new header called "Authorization", and in the value, paste in the token.
